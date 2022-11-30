@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -18,9 +19,10 @@ import calendar
 import datetime
 import ast
 
+@csrf_exempt
 
 def index(request):
-    return render(request, "https://barbershop1.onrender.com")
+    return render (request, "http://localhost:3000")
 
 
 @api_view(['POST'])
@@ -60,8 +62,11 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 #  signin/Login
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
-    
 
+@api_view(['GET'])
+def test(request):
+    
+     return JsonResponse([{"time":"08:00"},{"time":"09:00"},{"time":"18:00"}],safe=False )
 #set hours for each date
 @api_view(['POST'])
 def date(request):
