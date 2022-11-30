@@ -20,7 +20,7 @@ import ast
 
 
 def index(request):
-    return render(request, "http://localhost:3000")
+    return render(request, "https://barbershop1.onrender.com")
 
 
 @api_view(['POST'])

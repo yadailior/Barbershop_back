@@ -29,9 +29,9 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-   ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+# RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+# if RENDER_EXTERNAL_HOSTNAME:
+#    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 
 
@@ -103,7 +103,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
  
     "corsheaders.middleware.CorsMiddleware",
- 
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -111,7 +111,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
- 
+
+
+CORS_ALLOWED_ORIGINS = [
+    'https://yadailior.github.io/barbershop_front/',
+]
+
 ROOT_URLCONF = 'backend.urls'
  
 TEMPLATES = [
