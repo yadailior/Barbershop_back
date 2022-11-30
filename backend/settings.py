@@ -114,7 +114,7 @@ MIDDLEWARE = [
 
 
 CORS_ALLOWED_ORIGINS = [
-    'https://yadailior.github.io/barbershop_front/',
+    'https://yadailior.github.io/barbershop_front',
 ]
 
 ROOT_URLCONF = 'backend.urls'
