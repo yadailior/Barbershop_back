@@ -9,7 +9,7 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('', views.index ),
+    # path('', views.index ),
     path('login', MyTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('register',views.register ,name="register"),

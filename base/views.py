@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from rest_framework.response import Response
@@ -7,10 +6,8 @@ from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from django.shortcuts import render
 from rest_framework.decorators import api_view,permission_classes
 from django.contrib.auth import logout
-from django.contrib import messages
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from base.serializers import BookingSerializer,PhotoSerializer,UserSerializer
@@ -21,14 +18,12 @@ import ast
 
 @csrf_exempt
 
-def index(request):
-    return render (request, "http://localhost:3000")
 
 
 @api_view(['POST'])
 #register method
 def register(request):
-    print(request.data)
+    # print(request.data)
     serializer = UserSerializer(data =request.data)
     if serializer.is_valid():
         User.objects.create_user(email=request.data['email'], password=request.data['password'],username=request.data['username'],first_name=request.data["First_Name"],last_name=request.data["Last_Name"])
@@ -36,18 +31,23 @@ def register(request):
         username=request.data['username']
         return JsonResponse({"password":password,"username":username})
     else:
-        print("none")
-
+        # print(serializer.errors)
+        return JsonResponse({"error":serializer.errors['username']})
+        
 
 
 @api_view(['POST'])
 #logout user
 def logout_user(request):
     logout(request)
-    return JsonResponse({'user':"done"})
+    return JsonResponse({'user':"logout"})
 
 
 #set user token
+"""This method create for each user token to be recognize 
+
+    Returns: Token
+"""
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -60,13 +60,18 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 #  signin/Login
+"""This method uses MyTokenObtainPairSerializer to check if the user is valid"""
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
-@api_view(['GET'])
-def test(request):
-    
-     return JsonResponse([{"time":"08:00"},{"time":"09:00"},{"time":"18:00"}],safe=False )
+
+"""This is the heart of the system, for each chosen  date tis method check if the chosen date is already in the DB.
+    if it is exsits return the remain work hours for the specific date.
+        but before its run on the list to return only the future hours.
+    else it checks which week day is is to match the correct work hours
+        and returns the work hours as list
+
+"""
 #set hours for each date
 @api_view(['POST'])
 def date(request):
@@ -108,8 +113,13 @@ def date(request):
             print(datetime.datetime.today().date())
             return JsonResponse({"hours":str(sort_hour_list)})
             
-        
-    
+
+
+       
+"""
+This method set all the booking data by check all the currents dates and sort them.
+Its match each book hour to the spcific date and after that for each user.
+"""    
 @api_view(['GET'])   
 def getCalendar(request):
     booking_data=Booking.objects.filter()
@@ -144,13 +154,19 @@ def getCalendar(request):
             else: 
                 booking_for_date[date]=[{"book_hour":book_hour,"username":username}]
                 
-    print(booking_for_date)
+    # print(booking_for_date)
             
     return JsonResponse({"booking":booking_for_date})
 
     
 
- 
+""" POST method:
+This method is create to match chosen book hour to the user that pick it.
+
+GET method:
+returns all the bookig data for the specific user
+
+""" 
 @api_view(['POST','GET'])
 #add booking data
 @permission_classes([IsAuthenticated])
@@ -199,12 +215,16 @@ def booking (request):
         # print(serializer.data)
         return Response(serializer.data)
         
-        
+
+
+"""
+In this method by getting the Booking id delete it from the DB anf return the time to the specific date.
+"""     
 @api_view(['POST'])
 #delete data from booking DB
 @permission_classes([IsAuthenticated])
 def cancle_book(request):
-        print(request.data)
+        # print(request.data)
         if request.method == 'POST':
             books = Booking.objects.get(id =request.data["id"])
             # print(request.data["id"])
@@ -223,8 +243,6 @@ def cancle_book(request):
             
             return Response(serializer.data)
         
-
-
 
 
 @api_view(['GET'])
@@ -265,3 +283,8 @@ def delPhoto(request,urlId):
     
     return JsonResponse("res",safe=False)
     
+    
+@api_view(['GET'])
+def test(request):
+    
+     return JsonResponse([{"time":"08:00"},{"time":"09:00"},{"time":"18:00"}],safe=False )
